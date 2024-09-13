@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <title>Prisoner's Dilemma</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            padding-top: 20px;
+            background-image: url('static/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #login-page {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+        #login-name {
+            margin-bottom: 15px;
+        }
+        .middle-div {
+            display: flex;
+            justify-content: space-around;
+        }
+        #nav-user, #nav-game{
+            width: 100vw;
+        }
+        #lobby-list {
+            overflow-y: auto;
+            height: 70vh;
+        }
+        .vertical-div {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .user-link {
+            display: block;
+            align-self: center;
+            font-size: 20px;
+            width: fit-content;
+            text-decoration: underline;
+        }
+        .separate {
+            align-self: center;
+            width: fit-content;
+            margin: 20px;
+        }
+        .decision {
+            font-size: 40px;
+        }
+        #body-game {
+            height: 75vh;
+        }
+        #exit-game {
+            align-self: center;
+        }
+        .btn-secondary {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page" style="display: none;">
+        <input type="text" name="username" id="login-name" placeholder="Enter your name">
+        <button class="btn btn-primary btn-block" onclick="confirmLogin()">Enter</button>
+    </div>
+
+    <div id="lobby-page" style="display: none;">
+        <div id="nav-user" class="middle-div">
+            <h3 id="nav-name"></h3>
+            <h3 id="nav-score">Score: 0</h3>
+            <form id="logout-form" action="logout" method="post">
+                <button type="button" class="btn btn-secondary" onclick="confirmLogout()">Logout</button>
+            </form>
+        </div>
+        <div id="lobby" class="vertical-div">
+            <div id="lobby-header" class="vertical-div">
+                <button class="btn btn-primary separate" onclick="challengeRandom()">Challenge a random player</button>
+                <h4>Click name to challenge!</h4>
+            </div>
+            <div id="lobby-list" class="vertical-div"></div>
+        </div>
+    </div>
+
+    <div id="game-page" style="display: none;">
+        <div id="nav-game" class="middle-div">
+            <h3 id="score-you"></h3>
+            <h3 id="score-enemy"></h3>
+        </div>
+        <div id="body-game" class="vertical-div">
+            <div id="option">
+                <div class="middle-div">
+                    <h4 class="separate">Choose your option:</h4>
+                </div>
+                <div class="middle-div">
+                    <button class="btn btn-danger decision"  onclick="submitOption('steal')">Steal</button>
+                    <button class="btn btn-success decision" onclick="submitOption('split')">Split</button>
+                </div>
+            </div>
+            <h4 id="wait" class="separate" style="display: none;">Waiting for your opponent...</h4>
+        </div>
+        <div class="vertical-div">
+            <button id="exit-game" class="btn btn-secondary" onclick="terminateGame()">Leave Game</button>
+        </div>
+    </div>
+</body>
+<script src="static/socketIO.js"></script>
+</html>
