@@ -47,14 +47,14 @@ def initialize():
 def login():
     js = request.get_json()
     name = js['username']
-    if name in data['status']:
+    if name in data['status'] and name in sid:
         return 'Username already taken!', 409
     id = js['sid']
     session['username'] = name
-    session.modified = True
     sid[name] = id
-    for key, value in zip(DATA_KEY, KEY_VALUE):
-        data[key][name] = value
+    if name not in data['status']:
+        for key, value in zip(DATA_KEY, KEY_VALUE):
+            data[key][name] = value
     data['score_now'][name] = [] # FIX: mutable object will share same reference
     socketio.emit('update_user_list', data['status'])
     return {'username': name, 'score': data['score'][name], 'user_list': data['status']}, 200
@@ -65,8 +65,9 @@ def logout():
     session.pop('username', None)
     session.pop('sid', None)
     sid.pop(name, None)
-    for key in DATA_KEY:
-        data[key].pop(name, None)
+    if data['score_total'][name] == 0: 
+        for key in DATA_KEY:
+            data[key].pop(name, None)
     socketio.emit('update_user_list', data['status'])
     return redirect('/')
 
@@ -158,7 +159,9 @@ def terminate_game():
 
 @app.route('/leaderboard', methods=['GET'])
 def leaderboard():
-    1
+    qualified = {k: v for k, v in data['score'].items() if data['N_game'][k] >= 7}
+    sorted_res = dict(sorted(qualified.items(), key=lambda item: item[1], reverse=True))
+    return render_template('leaderboard.html', leaderboard=sorted_res)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', debug=True)
