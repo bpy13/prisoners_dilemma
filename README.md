@@ -14,10 +14,10 @@ Each player participates in multiple rounds, randomly between 5 to 9 rounds. The
 ## Screenshots
 
 <p align="center">
-  <img src="png/login.png" alt="Login" width="25%"/>
-  <img src="png/lobby.png" alt="Game Lobby" width="25%"/>
-  <img src="png/game.png" alt="In Game" width="25%"/>
-  <img src="png/result.png" alt="Game Result" width="25%"/>
+  <img src="png/login.png" alt="Login" width="23%"/>
+  <img src="png/lobby.png" alt="Game Lobby" width="23%"/>
+  <img src="png/game.png" alt="In Game" width="23%"/>
+  <img src="png/result.png" alt="Game Result" width="23%"/>
 </p>
 
 ## Prerequisites
