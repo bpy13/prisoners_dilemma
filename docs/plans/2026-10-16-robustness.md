@@ -34,33 +34,36 @@ and ruff. Built by one agent in this session (no per-phase helpers, as instructe
     `environment.yml`, `requirements-dev.txt`, `pyproject.toml` (ruff + pytest config)
   - Done when: `conda run -n prisoners_dilemma python -m pytest --version` and
     `ruff --version` both print a version.
-- [ ] **Task 2: Scoring and game model with tests first**
+- [x] **Task 2: Scoring and game model with tests first**
   - Files: create `game.py` (`compute_score`, `Player`, `Match`, `GameState`),
     `tests/test_game.py`
   - Done when: `python -m pytest tests/test_game.py` passes (payoff table, round flow,
     average, leaderboard ordering numeric: 10.0 above 9.5).
-- [ ] **Task 3: Rewrite socket handlers and routes on the new model**
+- [x] **Task 3: Rewrite socket handlers and routes on the new model**
   - Files: modify `app.py`; create `tests/test_app.py`
   - Done when: `python -m pytest` passes, covering a full match through the SocketIO test
     client, invalid moves/challenges, disconnect and logout mid-game, login with a bogus sid,
     leaderboard page order.
+  - Change during build: a disconnect waits `DISCONNECT_GRACE_SECONDS` (default 10) before
+    ending the match and freeing the name, so the page reload after login, or a refresh
+    mid-game, doesn't end the game. The name stays reserved during that time.
   - Notes: `connect`/`disconnect` handlers track live sockets; `initialize` binds the session's
     player to `request.sid` (the newest tab wins; the old tab gets `login_page`); login accepts
     the client sid only if it is a live socket not bound to anyone, otherwise it logs in
     unbound and the reload's `initialize` binds it. Lock `state.lock` around state changes.
-- [ ] **Task 4: Config: debug, secret key, host/port**
+- [x] **Task 4: Config: debug, secret key, host/port**
   - Files: modify `app.py`; create `.env.example`; modify `.gitignore`
   - Done when: a test asserts debug defaults off and SECRET_KEY is read from the env; the app
     starts with no `.env` (checked by launching it).
   - Notes: env vars `SECRET_KEY`, `DEBUG` (1/true/yes), `HOST` (default 0.0.0.0), `PORT`
     (default 5000). Load `.env` with python-dotenv. `allow_unsafe_werkzeug=True` is needed to
     run the dev server with debug off.
-- [ ] **Task 5: Client and template touch-ups**
+- [x] **Task 5: Client and template touch-ups**
   - Files: modify `static/socketIO.js` (alert on `challenge_failed`),
     `templates/leaderboard.html` (cdnjs Bootstrap URL, formatted score)
   - Done when: two scripted socket clients complete the main flow against the running app and
     `/leaderboard` renders.
-- [ ] **Task 6: Repo hygiene**
+- [x] **Task 6: Repo hygiene**
   - Files: `git rm --cached static/.DS_Store`; `.gitignore` gets `**/.DS_Store`, `.env`,
     caches; shrink `png/*.png` to 800px wide
   - Done when: `git ls-files` shows no `.DS_Store`; png sizes drop and the images still look
