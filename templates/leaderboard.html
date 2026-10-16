@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             display: flex;
@@ -19,6 +19,7 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Leaderboard</h1>
+        <p>Average points per round. Players appear after {{ min_games }} games.</p>
         <table class="table">
             <thead>
                 <tr>
@@ -27,10 +28,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for player, score in leaderboard.items() %}
+                {% for player, score in leaderboard %}
                 <tr>
                     <td>{{ player }}</td>
-                    <td>{{ score }}</td>
+                    <td>{{ "%.2f"|format(score) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

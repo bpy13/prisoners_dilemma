@@ -64,7 +64,8 @@ function confirmLogin() {
             body: JSON.stringify({ username: name, sid: sid }),
         }).then(response => {
             if (response.ok) return response.json();
-            else throw new Error('Username already taken!');
+            // the server explains why (name taken, empty, too long)
+            return response.text().then(text => { throw new Error(text); });
         })
         .then(data => {
             showLobby(data);
@@ -92,6 +93,10 @@ function issueChallenge(username) {
         socket.emit('issue_challenge', { receiver: username });
     }
 }
+
+socket.on('challenge_failed', function(reason) {
+    alert(`Challenge failed: ${reason || 'that player is not available'}`);
+});
 
 function challengeRandom() {
     const lobbyList = document.getElementsByClassName('user-link');
