@@ -24,11 +24,15 @@ What was decided, why, and when. Change these only with a reason, and note the c
   a game ended early (leave, logout, disconnect) still counts as a game played and keeps the
   rounds already scored.
 - 2026-10-16: A closed tab or lost connection ends that player's match (the opponent returns to
-  the lobby) and frees the username. Returning with the same username restores the player's
-  stats, as logging back in already did.
-- 2026-10-16: On logout, a player who has never played a round is forgotten; others are kept
-  for the leaderboard (before: kept only if their total score was above 0, so a player who
-  scored 0 points lost their games played).
+  the lobby) and frees the username, after a grace period (`DISCONNECT_GRACE_SECONDS`,
+  default 10) so that a page reload, including the automatic one right after login, doesn't
+  end the game. The name stays reserved during the grace period. Returning with the same
+  username restores the player's stats, as logging back in already did.
+- 2026-10-16: When a player goes offline (logout or lost connection) and has never played a
+  game or round, they are forgotten; others are kept for the leaderboard (before: logout kept
+  only players whose total score was above 0, so a player who scored 0 points lost their
+  games played).
+- 2026-10-16: Usernames are trimmed and must be 1–30 characters.
 - 2026-10-16: The lobby lists only online players (before: logged-out players with a score
   stayed listed and challenging them crashed the server).
 

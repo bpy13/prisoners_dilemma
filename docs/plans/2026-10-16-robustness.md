@@ -68,7 +68,7 @@ and ruff. Built by one agent in this session (no per-phase helpers, as instructe
     caches; shrink `png/*.png` to 800px wide
   - Done when: `git ls-files` shows no `.DS_Store`; png sizes drop and the images still look
     right when opened.
-- [ ] **Task 7: README and requirements**
+- [x] **Task 7: README and requirements**
   - Files: modify `README.md`, `requirements.txt`
   - Done when: README covers setup (conda and pip), env vars, running, tests, lint, rules
     including auto-accept and the 7-game threshold; commands in it were run.
