@@ -48,10 +48,18 @@ class Player:
     rounds_played: int = 0
     games_played: int = 0
     match: Match | None = None
+    # Set while a dropped connection may still come back (page reload, network blip); the
+    # name stays reserved and the match stays open until the grace period runs out.
+    reconnect_token: object | None = None
 
     @property
     def online(self) -> bool:
         return self.sid is not None
+
+    @property
+    def reserved(self) -> bool:
+        """True while nobody else may log in with this name."""
+        return self.online or self.reconnect_token is not None
 
     @property
     def average(self) -> float:
@@ -122,6 +130,7 @@ class GameState:
     def reset(self):
         self.players: dict[str, Player] = {}
         self._by_sid: dict[str, Player] = {}
+        self.connected: set[str] = set()  # every live socket id, bound to a player or not
 
     # --- players and sockets -------------------------------------------------
 
@@ -133,10 +142,15 @@ class GameState:
             self.players[name] = Player(name)
         return self.players[name]
 
-    def forget(self, player: Player):
-        """Drop a player entirely (used on logout for players who never played)."""
-        self.unbind(player)
-        self.players.pop(player.name, None)
+    def forget_if_unplayed(self, player: Player):
+        """Drop an offline player who has never played, so the name list doesn't grow forever.
+
+        Players with history are kept for the leaderboard and get their stats back when they
+        log in again with the same name.
+        """
+        never_played = player.rounds_played == 0 and player.games_played == 0
+        if never_played and not player.reserved and player.match is None:
+            self.players.pop(player.name, None)
 
     def player_by_sid(self, sid: str) -> Player | None:
         return self._by_sid.get(sid)
@@ -150,6 +164,7 @@ class GameState:
         if previous_owner is not None and previous_owner is not player:
             previous_owner.sid = None
         player.sid = sid
+        player.reconnect_token = None
         self._by_sid[sid] = player
         return old if old != sid else None
 
