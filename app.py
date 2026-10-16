@@ -94,6 +94,26 @@ def current_player() -> Player | None:
     return state.player_by_sid(request.sid)
 
 
+def session_player(recreate: bool = False) -> Player | None:
+    """The player this browser's login cookie belongs to, or None if there is none or the cookie
+    is out of date (someone else has logged in with that name since)."""
+    name, token = session.get("username"), session.get("login_token")
+    if not isinstance(name, str) or not isinstance(token, str):
+        return None
+    player = state.get(name)
+    if player is None:
+        if not recreate:
+            return None
+        # Logged in earlier but forgotten after going offline without playing; nobody else has
+        # the name, so give it back.
+        player = state.get_or_create(name)
+        player.login_token = token
+        return player
+    if player.login_token is None or not secrets.compare_digest(player.login_token, token):
+        return None
+    return player
+
+
 def expire_after_grace(name: str, token: object, seconds: float):
     """Background task: take the player offline unless they reconnected in the meantime."""
     socketio.sleep(seconds)
@@ -128,7 +148,9 @@ def login():
         if existing is not None and existing.reserved:
             return "Username already taken!", 409
         player = state.get_or_create(name)
+        player.login_token = secrets.token_urlsafe(16)
         session["username"] = name
+        session["login_token"] = player.login_token
         # The browser sends its socket id so the name is reserved straight away. Only accept it
         # if it is a live socket that nobody owns; otherwise the page reload that follows login
         # binds the real socket in `initialize`.
@@ -141,10 +163,12 @@ def login():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    name = session.pop("username", None)
     with state.lock:
-        player = state.get(name)
+        player = session_player()
+        session.pop("username", None)
+        session.pop("login_token", None)
         if player is not None:
+            player.login_token = None
             take_offline(player)
     return redirect("/")
 
@@ -184,14 +208,10 @@ def on_disconnect():
 
 
 @socketio.on("initialize")
-def initialize():
+def initialize(*_ignored):
     """Sent by every page load: show the login, lobby or game page for this browser session."""
     with state.lock:
-        name = session.get("username")
-        player = state.get(name)
-        if player is None and name:
-            # Logged in earlier but forgotten (e.g. the page reload right after login).
-            player = state.get_or_create(name)
+        player = session_player(recreate=True)
         if player is None:
             socketio.emit("login_page", request.sid, to=request.sid)
             return
@@ -218,7 +238,9 @@ def initialize():
 
 
 @socketio.on("issue_challenge")
-def handle_challenge(js):
+def handle_challenge(*args):
+    # *args: a hand-crafted client may send no payload or several; never let that raise.
+    js = args[0] if args else None
     with state.lock:
         challenger = current_player()
         if challenger is None:
@@ -240,7 +262,8 @@ def handle_challenge(js):
 
 
 @socketio.on("submit_option")
-def handle_decision(option):
+def handle_decision(*args):
+    option = args[0] if len(args) == 1 else None
     with state.lock:
         player = current_player()
         if player is None or player.match is None:
@@ -270,7 +293,7 @@ def handle_decision(option):
 
 
 @socketio.on("terminate_game")
-def terminate_game():
+def terminate_game(*_ignored):
     with state.lock:
         player = current_player()
         if player is None:

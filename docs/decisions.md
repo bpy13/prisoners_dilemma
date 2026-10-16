@@ -33,6 +33,9 @@ What was decided, why, and when. Change these only with a reason, and note the c
   only players whose total score was above 0, so a player who scored 0 points lost their
   games played).
 - 2026-10-16: Usernames are trimmed and must be 1–30 characters.
+- 2026-10-16: Each login stores a random token in the session cookie and on the player; page
+  loads and logout only act for a cookie whose token matches, so an old cookie can't take a
+  name back from someone who logged in with it later (found in the pre-release review).
 - 2026-10-16: The lobby lists only online players (before: logged-out players with a score
   stayed listed and challenging them crashed the server).
 

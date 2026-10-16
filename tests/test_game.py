@@ -115,6 +115,15 @@ def test_status_lists_only_online_players():
     assert state.status() == {"alice": "bob", "bob": "alice"}
 
 
+def test_bind_refuses_a_socket_owned_by_someone_else():
+    state = GameState()
+    a, b = state.get_or_create("alice"), state.get_or_create("bob")
+    state.bind(a, "sid-a")
+    with pytest.raises(GameError):
+        state.bind(b, "sid-a")
+    assert a.sid == "sid-a" and state.player_by_sid("sid-a") is a and not b.online
+
+
 def test_unbind_frees_the_name_and_sid():
     state = GameState()
     a = state.get_or_create("alice")

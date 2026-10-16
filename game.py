@@ -51,6 +51,9 @@ class Player:
     # Set while a dropped connection may still come back (page reload, network blip); the
     # name stays reserved and the match stays open until the grace period runs out.
     reconnect_token: object | None = None
+    # Random value from the latest login, also stored in that browser's session cookie, so an
+    # old cookie can't take the name back after someone else has logged in with it.
+    login_token: str | None = None
 
     @property
     def online(self) -> bool:
@@ -157,12 +160,14 @@ class GameState:
 
     def bind(self, player: Player, sid: str) -> str | None:
         """Attach a socket to a player. Returns the socket it replaced, if any."""
+        previous_owner = self._by_sid.get(sid)
+        if previous_owner is not None and previous_owner is not player:
+            # Callers only bind sockets nobody owns; silently moving it would strand the other
+            # player's match.
+            raise GameError("socket already belongs to another player")
         old = player.sid
         if old is not None and old != sid:
             self._by_sid.pop(old, None)
-        previous_owner = self._by_sid.get(sid)
-        if previous_owner is not None and previous_owner is not player:
-            previous_owner.sid = None
         player.sid = sid
         player.reconnect_token = None
         self._by_sid[sid] = player

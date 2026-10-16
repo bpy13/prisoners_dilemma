@@ -72,4 +72,4 @@ and ruff. Built by one agent in this session (no per-phase helpers, as instructe
   - Files: modify `README.md`, `requirements.txt`
   - Done when: README covers setup (conda and pip), env vars, running, tests, lint, rules
     including auto-accept and the 7-game threshold; commands in it were run.
-- [ ] **Task 8: End of run** – pre-release review, fix in-scope findings, wrap-up, ship.
+- [x] **Task 8: End of run** – pre-release review, fix in-scope findings, wrap-up, ship.

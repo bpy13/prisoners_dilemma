@@ -188,6 +188,34 @@ def test_events_from_unknown_socket_are_ignored():
     assert stranger.events() == []
 
 
+def test_wrong_number_of_arguments_is_ignored():
+    alice, bob = two_players()
+    alice.sock.emit("issue_challenge")
+    assert len(alice.events("challenge_failed")) == 1
+    start_match(alice, bob)
+    alice.sock.emit("submit_option")
+    alice.sock.emit("submit_option", "split", "steal")
+    assert state.get("alice").match.decisions["alice"] is None
+    alice.sock.emit("initialize", "extra")
+    alice.sock.emit("terminate_game", "extra")
+    assert "game_end" in [e["name"] for e in bob.events()]
+
+
+def test_old_cookie_cannot_take_back_a_name_someone_else_holds():
+    first = Browser()
+    first.login("bob")
+    first.sock.disconnect()  # tab closed: name freed (grace period 0 in tests)
+    second, dave = Browser(), Browser()
+    assert second.login("bob").status_code == 200
+    dave.login("dave")
+    second.sock.emit("issue_challenge", {"receiver": "dave"})
+    first.open_page()  # the first browser comes back with its old cookie
+    assert len(first.events("login_page")) == 1
+    assert first.events("game_page") == []
+    first.http.post("/logout")  # must not end the new bob's game
+    assert state.get("bob").match is not None and state.get("bob").online
+
+
 def test_leave_game_returns_both_to_lobby():
     alice, bob = two_players()
     start_match(alice, bob)

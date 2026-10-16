@@ -18,11 +18,5 @@ here; a limit or trap we live with goes in `known-issues.md`. Each item in one p
 
 ## Later
 
-- **Two tabs, one login.** If the same browser opens the game in a second tab, the newest tab
-  takes over and the older one is sent back to the login screen (before, both tabs could act
-  as the player). Fine for now; revisit if players complain.
-- **Dev server log noise.** When a websocket closes, Werkzeug's dev server logs a harmless
-  `code 400, message Bad request ...` line. The game is unaffected. A production server
-  (e.g. eventlet or gunicorn) would remove it, if the game is ever hosted publicly.
-- **In-memory state.** All scores are lost on restart (as before). A small SQLite file would
-  keep the leaderboard, if wanted.
+- Limits we live with (two tabs, in-memory state, dev-server log noise) are in
+  `known-issues.md`.
