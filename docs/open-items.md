@@ -1,15 +1,13 @@
 # Open items
 
-As of 2026-10-16. Tick off, or move to `decisions.md` when settled. A bug that will be fixed goes
+As of 2026-10-18. Tick off, or move to `decisions.md` when settled. A bug that will be fixed goes
 here; a limit or trap we live with goes in `known-issues.md`. Each item in one place only.
 
 ## Blockers
 
 ## Waiting on the user
 
-1. **No LICENSE file.** The README says "MIT License" but the repo has no `LICENSE` file, so
-   legally nothing is granted. Default: add a standard MIT `LICENSE` with your name and 2025.
-2. **Old screenshots stay in git history.** The four `png/` screenshots were shrunk (about
+1. **Old screenshots stay in git history.** The four `png/` screenshots were shrunk (about
    6.0 MB to 3.7 MB), but the original files remain in past commits, so cloning is not
    smaller. Removing them means rewriting pushed history (force push). Default: leave history
    alone.

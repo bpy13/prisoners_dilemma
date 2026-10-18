@@ -47,3 +47,6 @@ What was decided, why, and when. Change these only with a reason, and note the c
 - 2026-10-16: Conda env `prisoners_dilemma` from `environment.yml`; runtime pins in
   `requirements.txt`, test/lint tools in `requirements-dev.txt`; pytest and ruff configured in
   `pyproject.toml`.
+
+## Licence
+- MIT, copyright Brian Yu (2026-10-18), matching the name already on the commits. LICENSE file at the repo root.

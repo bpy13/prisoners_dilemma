@@ -92,4 +92,4 @@ The tests simulate browsers with Flask-SocketIO's test client: a full match, inv
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License; see [LICENSE](LICENSE).
